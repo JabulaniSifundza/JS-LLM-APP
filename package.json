@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "JB",
   "license": "ISC",
   "dependencies": {
     "@firebase/app": "^0.9.25",
@@ -20,5 +20,13 @@
     "pdfreader": "^3.0.2",
     "uuid": "^9.0.1",
     "yahoo-finance2": "^2.9.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JabulaniSifundza/JS-LLM-APP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JabulaniSifundza/JS-LLM-APP/issues"
+  },
+  "homepage": "https://github.com/JabulaniSifundza/JS-LLM-APP#readme"
 }
