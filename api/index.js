@@ -20,6 +20,11 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 const storage = admin.storage();
+const finance_books = [
+  "https://firebasestorage.googleapis.com/v0/b/financial-advisor-llm.appspot.com/o/LLM%20Sources%2FInvestopedia.pdf?alt=media&token=ecd64c82-f518-4592-80e5-be6a73543998",
+  "https://firebasestorage.googleapis.com/v0/b/financial-advisor-llm.appspot.com/o/LLM%20Sources%2FDean%20Paxson%2C%20Douglas%20Wood%2C%20Blackwell%20Encyclopedic%20Dictionary%20of%20Finance%20(1997).pdf?alt=media&token=55ad60d9-8fd1-44b8-88fc-63d5076781be",
+  "https://firebasestorage.googleapis.com/v0/b/financial-advisor-llm.appspot.com/o/LLM%20Sources%2FA-plain-English-guide-to-financial-terms.pdf?alt=media&token=ea04f56f-9e42-43f3-be2e-61d62c516574",
+];
 
 async function extractPdfText(url) {
     try{
@@ -71,6 +76,7 @@ function euclideanDistance(a, b){
 }
 
 async function performQuerySearch(query, docs){
+  const query_result = []
   const queryValues = await embedRetrievalQuery(query)
   console.log(query)
   for(const doc of docs){
@@ -79,22 +85,27 @@ async function performQuerySearch(query, docs){
       euclideanDistance(doc.values, queryValues),
       doc.text.substr(0, 40)
     )
-    return (" ", euclideanDistance(doc.values, queryValues), doc.text.substr(0, 40));
+    query_result.push(" ", euclideanDistance(doc.values, queryValues), doc.text.substr(0, 40));
   }
+  return query_result;
 }
 
 async function runEmbed(question){
-  const docs = await embedRetrievalDocs([])
+  const docs = await embedRetrievalDocs(returnKnowledge());
   await performQuerySearch(question, docs);
+}
+
+async function returnKnowledge(){
+  const knowledge = [];
+  for (const book of finance_books) {
+    const book_text = await extractPdfText(book);
+    knowledge.push(book_text);
+  }
+  return knowledge;
 }
 
 app.get("/home", async (req, res) => {
   try{
-    const finance_books = [
-      "https://firebasestorage.googleapis.com/v0/b/financial-advisor-llm.appspot.com/o/LLM%20Sources%2FInvestopedia.pdf?alt=media&token=ecd64c82-f518-4592-80e5-be6a73543998",
-      "https://firebasestorage.googleapis.com/v0/b/financial-advisor-llm.appspot.com/o/LLM%20Sources%2FDean%20Paxson%2C%20Douglas%20Wood%2C%20Blackwell%20Encyclopedic%20Dictionary%20of%20Finance%20(1997).pdf?alt=media&token=55ad60d9-8fd1-44b8-88fc-63d5076781be",
-      "https://firebasestorage.googleapis.com/v0/b/financial-advisor-llm.appspot.com/o/LLM%20Sources%2FA-plain-English-guide-to-financial-terms.pdf?alt=media&token=ea04f56f-9e42-43f3-be2e-61d62c516574",
-    ];
     const knowledge = [];
     const cc = new chroma.ChromaClient({ path: "http://localhost:8000" });
     await cc.reset();
