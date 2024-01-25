@@ -91,7 +91,7 @@ async function performQuerySearch(query, docs){
 }
 
 async function runEmbed(question){
-  const docs = await embedRetrievalDocs(returnKnowledge());
+  const docs = await embedRetrievalDocs(await returnKnowledge());
   await performQuerySearch(question, docs);
 }
 
